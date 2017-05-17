@@ -9,7 +9,7 @@ public string CleanerSystemMenuItems_ParentMenuItem => "stocknameOfToolStripMenu
 ```
 Alternate format:
 ```chsarp
-public Type CleanerSystemMenuItems_ParentPluginMenuItem { get{ typeof(ClassNameOfParentISystemMenuItemPlugin); } }
+public Type CleanerSystemMenuItems_ParentPluginMenuItem { get{ return typeof(ClassNameOfParentISystemMenuItemPlugin); } }
 public string CleanerSystemMenuItems_ParentMenuItem { get{ return "stocknameOfToolStripMenuItem"; } }
 ```
 
