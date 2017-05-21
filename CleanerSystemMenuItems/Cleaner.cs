@@ -47,7 +47,7 @@ namespace CleanerSystemMenuItems
         /// </summary>
         private void CleanUpSystemMenu()
         {
-            Unbroken.LaunchBox.Desktop.Forms.MainForm MainForm = (Unbroken.LaunchBox.Desktop.Forms.MainForm)(PluginHelper.LaunchBoxMainForm);
+            Form MainForm = PluginHelper.LaunchBoxMainForm;
             if (MainForm == null) return;
             Control stripX = MainForm?.Controls?["topPanel"]?.Controls?["menuStrip"];
             if (stripX == null) return;
@@ -76,47 +76,68 @@ namespace CleanerSystemMenuItems
                 }
             }
 
-            foreach (KeyValuePair<Type, Tuple<ISystemMenuItemPlugin, ToolStripMenuItem>> pair in PluginToolStripItems)
+            if (PluginToolStripItems.Count > 0)
             {
-                Type pluginType = pair.Value.Item1.GetType();
-                PropertyInfo property = pluginType.GetProperty("CleanerSystemMenuItems_ParentPluginMenuItem");
-                if (property != null)
+                foreach (KeyValuePair<Type, Tuple<ISystemMenuItemPlugin, ToolStripMenuItem>> pair in PluginToolStripItems)
                 {
-                    try
+                    Type pluginType = pair.Value.Item1.GetType();
+                    PropertyInfo property = pluginType.GetProperty("CleanerSystemMenuItems_ParentPluginMenuItem");
+                    if (property != null)
                     {
-                        object RetVal = property.GetMethod.Invoke(pair.Value.Item1, new object[] { });
-                        if (RetVal != null && RetVal is Type)
+                        try
                         {
-                            if (PluginToolStripItems.ContainsKey((Type)RetVal))
+                            object RetVal = property.GetMethod.Invoke(pair.Value.Item1, new object[] { });
+                            if (RetVal != null && RetVal is Type)
                             {
-                                ToolsMenu.DropDownItems.Remove(pair.Value.Item2);
-                                PluginToolStripItems[(Type)RetVal].Item2.DropDownItems.Add(pair.Value.Item2);
+                                if (PluginToolStripItems.ContainsKey((Type)RetVal))
+                                {
+                                    ToolsMenu.DropDownItems.Remove(pair.Value.Item2);
+                                    PluginToolStripItems[(Type)RetVal].Item2.DropDownItems.Add(pair.Value.Item2);
+                                }
                             }
                         }
+                        catch { }
                     }
-                    catch { }
                 }
-            }
 
-            foreach (KeyValuePair<Type, Tuple<ISystemMenuItemPlugin, ToolStripMenuItem>> pair in PluginToolStripItems)
-            {
-                Type pluginType = pair.Value.Item1.GetType();
-                PropertyInfo property = pluginType.GetProperty("CleanerSystemMenuItems_ParentMenuItem");
-                if (property != null)
+                foreach (KeyValuePair<Type, Tuple<ISystemMenuItemPlugin, ToolStripMenuItem>> pair in PluginToolStripItems)
                 {
-                    try
+                    Type pluginType = pair.Value.Item1.GetType();
+                    PropertyInfo property = pluginType.GetProperty("CleanerSystemMenuItems_ParentMenuItem");
+                    if (property != null)
                     {
-                        object RetVal = property.GetMethod.Invoke(pair.Value.Item1, new object[] { });
-                        if (RetVal != null && RetVal is string)
+                        try
                         {
-                            if (StockToolStripItems.ContainsKey((string)RetVal))
+                            object RetVal = property.GetMethod.Invoke(pair.Value.Item1, new object[] { });
+                            if (RetVal != null && RetVal is string)
                             {
-                                ToolsMenu.DropDownItems.Remove(pair.Value.Item2);
-                                StockToolStripItems[(string)RetVal].DropDownItems.Add(pair.Value.Item2);
+                                if (StockToolStripItems.ContainsKey((string)RetVal))
+                                {
+                                    ToolsMenu.DropDownItems.Remove(pair.Value.Item2);
+                                    StockToolStripItems[(string)RetVal].DropDownItems.Add(pair.Value.Item2);
+                                }
                             }
                         }
+                        catch { }
                     }
-                    catch { }
+                }
+
+                bool AnyPluginRootsLeft = false;
+                foreach (ToolStripItem tool in ToolsMenu.DropDownItems)
+                {
+                    if (tool.Tag != null && tool.Tag is ISystemMenuItemPlugin)
+                    {
+                        AnyPluginRootsLeft = true;
+                        break;
+                    }
+                }
+                if(!AnyPluginRootsLeft)
+                {
+                    ToolStripItem item = ToolsMenu.DropDownItems[ToolsMenu.DropDownItems.Count - 1];
+                    if(item is ToolStripSeparator)
+                    {
+                        ToolsMenu.DropDownItems.Remove(item);
+                    }
                 }
             }
         }
